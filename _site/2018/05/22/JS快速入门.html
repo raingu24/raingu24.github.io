@@ -1,0 +1,419 @@
+<p><a href="/index.html">返回首页</a></p>
+
+<h3 id="基本语法">基本语法</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		//alert("我不想执行");
+		alert("我想执行");
+		
+		// 变量
+		var x = 1;
+		
+		// 条件判断语句，语句可以嵌套。
+		if (x &lt; 2) {
+			x = 3;
+		}
+		
+		// 注视分两种，一种是这样的。
+		/*另一种
+		是这样的*/
+
+		// js区分大小写。
+
+</code></pre></div></div>
+
+<h3 id="数据类型和变量">数据类型和变量</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		/* Number 
+		   JS不区分整数和浮点数，统一用Number表示。以下都是合法的Number类型。
+		*/
+		123;         	// int
+		0.456; 		// float
+		1.2345e3;	// 科学计数法，表示1.2345*1000
+		-99;		// 负数
+		NaN;		// No a Number，当无法计算结果时表示。
+		Infinity;	// 表示无限大。当数值超过了JS的Number所能表示的最大值时，用此表示。
+		
+		/*字符串
+		   用单引号或者双引号括起了的任意文本。
+		*/
+
+		/*
+		   布尔值
+		   只有true和false
+		   可以进行逻辑运算。
+		 */
+
+		/*
+		   比较运算符
+		   ==，它会自动转换数据类型再比较。
+		   ===，它不会自动转换数据类型，如果数据类型不一致，返回false，如果一致，再比较。
+		   所以要始终使用===来进行相等运算。
+
+		   NaN比较特殊，它不与任何其它值相等，包括自身。位移能判断NaN的方法是通过调用isNaN()函数。isNaN(NaN);
+
+		   判断两个浮点数，尤其是无限循环小数时，不能直接比较，二十计算两者之间的差值是否小雨某个阈值。
+		   Math.abs(1/3 - (1-2/3)) &lt; 0.00000001; // true
+		*/
+
+		/*
+		   null和undefined
+
+		   null表示空，它和0，''不同。0是一个数值，''是一个长度为0的字符串。
+		   undefined表示未定义，在大多数情况下无用。
+		 */
+
+		/*
+		   数组：JS的数组可以同时使用任意类型的元素。
+
+		   一般使用[]的方式创建数组。
+		   也可以使用new Array(1,2,3);这样的方式来创建。
+		 */
+
+		/*
+		   对象：是一组由键值对组成的无序集合。
+		*/
+		var person = {
+			name: 'Bob',
+			age: 20,
+			tags: ['s', 'web', 'mobile'],
+			city: 'Beijing',
+			hasCar: true,
+			zipcode: null,
+		}
+		person.name;	// 对象属性的访问
+
+		/*
+		   变量
+		   var a;	// 此时的a的值为undefined。
+		   JS的变量是动态的，不需要定义数据类型。
+		 */
+		var x = 100;
+		console.log(x);	// 会在浏览器的控制台中看到结果。
+
+		/*
+		   strict模式
+
+		   如果声明变量的时候不使用var，则声明的变量会被视为全局变量，即便这个变量声明在函数体内。
+		   strict模式的作用，就是强制通过var声明变量，不使用var，就会导致运行错误。
+		   其实只要记住变量声明要加上var就好。这个模式就没有必要了。
+		*/
+		'use strict';
+		abc = 'hello, world';	// 如果浏览器支持strict，这段代码会报ReferenceError的错误。Safari不支持strict。
+		console.log(abc);
+
+</code></pre></div></div>
+
+<h3 id="字符串">字符串</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		/*可以使用转义字符‘\’*/
+
+		/*多行字符串
+		  用反引号来实现。
+		*/
+		console.log(`多行
+		字符串
+		测试`);
+
+		/*模版字符串
+	    	  `$(), good morning`，注意反引号和$()的模版。
+		  这种表达式只支持可以使用strict的浏览器。Safari不支持该模式。
+		*/
+		'use strict';
+		var name = "Jons";
+		var age = 20;
+		// var message = `hello, $(name), you are $(age) years old.`;	
+		var message = 'hello, ' + name + ', you are ' + age + ' years old';		// 用+来连接字符串。 
+		alert(message);
+
+		/*操作字符串
+		  需要特别注意的是，JS的字符串是不可变的。所有对字符串的改变操作，实际上都是获取了一个新的字符串，老字符串是不会发生改变的。
+		*/
+		var s = "Hello, world";
+		s.length;	// 13
+		s[0];		// h, 把字符串可以看作是字符的数组
+		
+		console.log(s.toUpperCase());	// 变大写
+		console.log(s.toLowerCase());	// 变小写
+		console.log(s.indexOf('world'));	// 获取指定字符串出现的位置
+		console.log(s.substring(0,5));	// 从0～5的字符
+		console.log(s.substring(7));	// 从7开始到结束的字符
+
+</code></pre></div></div>
+
+<h3 id="数组">数组</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		var arr = [1,2,3,14,'Hello',null,true];
+		
+		console.log(arr.length);	// 获取长度
+		
+		arr.length = 5;			// 当给length赋值的时候，会改变数组的长度，小于原长度，就舍弃后面的，而且操作不可逆。
+		console.log(arr);
+		arr.length = 7;			// 重新恢复长度也不会有原来的元素。新增的长度为undefined元素。
+		console.log(arr);
+		arr[5] = null;			
+		arr[6] = true;
+		arr[7] = 2000;			// 可以通过下标增加元素
+		console.log(arr);
+		arr[0] = 100;			// 可以通过下表改变一个元素
+		console.log(arr);
+
+		/*slice
+		  就是切片，是获取一个子数组
+		 */ 
+		console.log(arr.slice(0,3));	// 获取的是[)的关系。
+		console.log(arr.slice(3));	// 从3开始到结束。
+		console.log(arr.slice());	// 获取的是整个数组。
+
+		/*push和pop
+		  push向数组末尾添加若干个元素。
+		  pop把数组的最后一个元素删掉。
+		 */
+		console.log(arr.push('A','B'));
+		console.log(arr.pop());
+
+		/*unshift和shift
+		  unshift向数组头部添加若干元素。
+		  shift删除数组第一个元素。
+		 */ 
+		console.log(arr.unshift('A','B'));
+		console.log(arr.shift());
+
+		/*sort
+		  对数组进行排序。
+		  排序的方式可以自定义，这在函数章节中介绍。
+		  排序是直接在数组上进行，不产生新的数组。
+		 */
+		console.log(arr.sort());
+
+		/*reverse
+		  反转数组
+		 */
+		console.log(arr.reverse());
+
+		/*splice
+		  它由三个参数
+		  第一个参数，表示的是索引，从哪个地方开始。
+		  第二个索引，表示从开始之后连续几个元素。
+		  第三个索引，其实是&gt;=0的新添元素列表，表示要添加到第一个索引指向的位置的元素。
+		 */
+		console.log(arr.splice(1,2,'google','facebook'));// 既删除又添加。返回的是被删除的元素。
+		console.log(arr.splice(1,2));	// 只删除
+		console.log(arr.splice(1,0,'mobile','auto'));	// 只添加
+		console.log(arr);
+
+		/*concat
+		  该方法是连接两个数组，并返回一个新数组。
+		 */
+		console.log(arr.concat(['a','b','c']));
+		console.log(arr);	// concat不会修改已有的数组
+		console.log(arr.concat('x',['y','z']));	// concat会把所有的嵌套的数组都展开，添加到新数组中。
+
+		/*join
+		  把数组中的元素用指定的字符串连接起来，并返回连接后的字符串。
+		  如果元素不是字符串，会自动转换为字符串。
+		 */
+		console.log(arr.join('-'));
+
+		/*多维数组
+		 实际就是数组的嵌套
+		 */ 
+		var arr1 = [[1,2,3], [400,500,600], '-'];
+		console.log(arr1[1][1]);	// 取出500。
+
+		/*练习*/
+		var exercise = ['小明','小红','大军','阿黄'];
+		console.log(exercise.sort());
+
+</code></pre></div></div>
+
+<h3 id="对象">对象</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		/*对象
+		  是一种无序的集合数据类型，它由键值对构成。很像是字典。
+		*/
+		var xiaoming = {
+			name: 'xiaoming',
+			birth: 1990,
+			'middle-school': 'No.1 middle school',
+			height: 1.70,
+			weight: 65,
+		    	score: null
+		}
+		console.log(xiaoming.name);	// 访问对象的属性。
+		console.log(xiaoming['middle-school']);	// 有特殊符号的键需要用引号括起来，同时访问的时候要用下标的方式进行。这是通用方法，但是点方法更方便，所以要尽可能的使用标准的属性名，也就是键。
+		console.log(xiaoming.age);	// 不存在的属性返回的是undefined。
+
+		/*JS的对象是动态类型，所以可以自由的添加或删除对象。*/
+		xiaoming.age = 18;
+		console.log(xiaoming);		// 显示不出这个属性。
+		console.log(xiaoming.age);	// 可以使用这个属性，但是为什么不能在对象中看到？
+		delete xiaoming.age;
+		console.log(xiaoming);
+
+		/*检查对象是否有某一属性，可以使用in*/
+		console.log('name' in xiaoming);
+		console.log('age' in xiaoming);
+		console.log('toString' in xiaoming);	// 有可能是继承得到的，而并不是在对象中声明的。
+		console.log(xiaoming.hasOwnProperty('toString'));	// 可以判断属性是否为本对象自身的，而不是继承来的。
+
+
+</code></pre></div></div>
+
+<h3 id="条件判断">条件判断</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		/*条件语句和C基本一致，就不赘述了。*/
+
+		/*练习:计算bmi*/
+		var height = parseFloat(prompt('please enter height(m):'));
+		var weight = parseFloat(prompt('please enter weight(kg):'));
+		var bmi = weight / (height * height);
+		if (bmi &lt; 18.5){
+			console.log('too thin');
+		} else if(bmi &lt; 25) {
+			console.log('normal');
+		} else if(bmi &lt; 28) {
+			console.log('too weight');
+		} else if(bmi &lt; 32) {
+			console.log('fat');
+		} else {
+			console.log('too fat');
+		}
+
+</code></pre></div></div>
+
+<h3 id="循环">循环</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		/*for循环*/
+		/*练习*/
+		var i;
+		var x = 1;
+		for (i = 1; i &lt;= 10; i++) {
+			x *= i;	
+		}
+		console.log(x);
+		if (x === 3628800) {
+			console.log('1*2*3*4*...*10 = ' + i);
+		} else {
+			console.log('the result is wrong.');
+		}
+
+
+		/*for in*/
+		var o = {
+			name: 'Jack',
+			age: 20,
+			city: 'Beijing'
+		}
+		for(var key in o) {
+			console.log(key);
+		}
+
+		/*while*/
+		x = 0;
+		var n = 99;
+		while (n &gt; 0) {
+			x = x + n;
+			n = n - 2;
+		}
+		console.log(x);
+
+		/*do while*/
+		n = 0;
+		do {
+			n = n + 1;
+		} while (n &lt; 100);
+		console.log(n);
+
+		/*练习*/
+		var arr = ['Bart', 'Lisa', 'Adam'];
+		for (var i = 0; i &lt; arr.length; i++ ){
+			console.log(arr[i]);
+		}
+
+</code></pre></div></div>
+
+<h3 id="map和set">Map和Set</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		/*Map
+		  就是映射。
+		  它的内部结构实际就是一个二维数组，把关联的对象放在一个数组里面，实现快速查找。它实际的形态是用大括号包裹的。
+		*/	
+		var m = new Map([['Michael', 95], ['Bob',74], ['Tracy',85]]);
+		console.log(m.get('Michael'));
+		
+		var nm = new Map();
+		nm.set('Adam',67);
+		nm.set('Bob',59);
+		console.log(nm.has('Adam'));
+		console.log(nm.get('Adam'));
+		nm.delete('Adam');
+		console.log(nm);
+		nm.set('Bob',70);
+		console.log(nm);
+		
+		/*
+		  Set
+		  和Map的形态类似。但只存储不重复的key。
+		 */
+		var s1 = new Set();
+		var s2 = new Set([1,2,3]);
+		var s = new Set([1,2,3,3,'3']);
+		console.log(s);	// 自动删除重复的。
+		s.add(4);	// 向Set添加元素,重复添加没有效果。
+		console.log(s);
+		s.delete(3);	// 删除元素。
+		console.log(s);
+
+
+</code></pre></div></div>
+
+<h3 id="iterable-迭代">iterable 迭代</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		/*iterable
+		实际就是迭代类型。Array, Map, Set都属于iterable类型。
+		它可以通过for of来进行遍历。
+		*/	
+		var a = ['A','B','C'];
+		var s = new Set(['A','B','C']);
+		var m = new Map([[1,'x'],[2,'y'],[3,'z']]);
+		for (var x of a) {	// 遍历数组
+			console.log(x);
+		}
+		for (var x of s) {	// 遍历Set
+			console.log(x);
+		}
+		for (var x of m) {	// 遍历Map
+			console.log(x[0] + '=' + x[1]);
+		}
+
+		/*for in和for of有什么区别？
+		 */
+		a.name = 'Hello';
+		for (var x in a) {
+			console.log(x);	// 0,1,2,name。显然name不应该是数组的下标。数组实际上也是对象，只是它的键是下标而已。
+		}
+		for (var x of a) {
+			console.log(x);	// 0,1,2。不会显示name。这就是更先进的地方。
+		}
+		
+		/*forEach方法
+		   这是iterable内置的方法，可以更好的进行迭代操作。
+		 */
+		a.forEach(function(element, index, array){
+			// element, 指向当前元素的值
+			// index，指向当前索引
+			// array，指向Array对象本身
+			console.log(element + ', index = ' + index);
+		});
+
+		s.forEach(function(element, sameElement, set) {
+			console.log(element + ', sameElement = ' + sameElement);
+		});	// Set没有索引，所以它的元素和所谓的索引值是一样的。
+
+		m.forEach(function(value, key, map) {
+			console.log(value + ', key = ' + key);
+		});
+
+
+</code></pre></div></div>
+

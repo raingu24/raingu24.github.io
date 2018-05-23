@@ -1,0 +1,146 @@
+<p><a href="/index.html">返回首页</a></p>
+
+<h2 id="声明的属性">声明的属性</h2>
+
+<p>当编译器遇到属性声明的时候（参见The Objective-C Programming Language中的Declared Properties），它产生与封闭类、类别或协议相关的描述性元数据。你可以使用支持通过类或协议的名字来查找属性的函数来访问该元数据，获取@encode()字符串形式的属性类型，并且以C字符串数组的形式拷贝属性的属性列表。每个类和协议都有声明的属性列表。</p>
+
+<h3 id="属性类型和函数">属性类型和函数</h3>
+
+<p>Property结构体为属性描述符定义了一个不透明的句柄。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef struct objc_property *Property;
+</code></pre></div></div>
+
+<p>你可以使用函数class_copyPropertyList和protocol_copyPropertyList来检索与类和协议各自相关的属性数组：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>objc_property_t *class_copyPropertyList(Class cls, unsigned int *outCount)
+objc_property_t *protocol_copyPropertyList(Protocol *proto, unsigned int *outCount)
+</code></pre></div></div>
+
+<p>例如，给定下面的类声明：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@interface Lender: NSObject {
+    float alone;
+}
+@property float alone;
+@end
+</code></pre></div></div>
+
+<p>你可以使用下面的方式得到属性列表：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>id LenderClass = objc_getClass("Lender");
+unsigned int outCount;
+objc_property_t *properties = class_copyPropertyList(LenderClass, &amp;outCount);
+</code></pre></div></div>
+
+<p>你可以使用property_getName函数来发现属性的名字：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const char *property_getName(objc_property_t property);
+</code></pre></div></div>
+
+<p>你可以使用函数class_getProperty 和 protocol_getProperty结合类和属性的各自给定的名字来得到属性的引用：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>objc_property_t class_getProperty(Class cls, const char *name)
+objc_property_t protocol_getProperty(Protocol *proto, const char *name, BOOL isRequiredProperty, BOOL isInstanceProperty)
+</code></pre></div></div>
+
+<p>你可以使用property_getAttributes函数来发现属性的名字和@encode类型字符串。更详细的关于编码类型字符串的内容，参阅Type Encodings;该字符串的更详细内容，参阅Property Type String和Property Attribute Description Examples。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const char *property_getAttributes(objc_property_t property)
+</code></pre></div></div>
+
+<p>把这些放在一起，你可以使用下面的代码来打印和一个类相关的所有属性列表：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>id LenderClass = objc_getClass("Lender");
+unsigned int outCount, i;
+objc_property_t *properties = class_copyPropertyList(LenderClass, &amp;outCount);
+for (i = 0; i &lt; outCount; i++) {
+    objc_property_t property = properties[i];
+    fprintf(stdout, "%s %s\n",property_getName(property), property_getAttributes(property));
+}
+</code></pre></div></div>
+
+<h3 id="属性类型字符串">属性类型字符串</h3>
+
+<p>你可以使用property_getAttributes函数来发现名字、属性的@encode类型字符串、以及该属性的其它属性。</p>
+
+<p>该字符串从T开始，后面跟着@encode类型和都好，用V结束，后面跟着实例变量的名字。在它们之间，属性（attributes）用以下描述符制定，用逗号隔开：</p>
+
+<p><strong>Table 7-1</strong> 声明的属性类型编码</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>R</td>
+      <td>只读属性（readonly）</td>
+    </tr>
+    <tr>
+      <td>C</td>
+      <td>该属性是上次分配的值的副本（copy）</td>
+    </tr>
+    <tr>
+      <td>&amp;</td>
+      <td>该属性是上次分配的值的引用（retain）</td>
+    </tr>
+    <tr>
+      <td>N</td>
+      <td>该属性是非原子（nonatomic）</td>
+    </tr>
+    <tr>
+      <td>G<Name></Name></td>
+      <td>该属性定义一个自定义的getter选择器名字。该名字跟在G后面（例如，GcustmGetter）。</td>
+    </tr>
+    <tr>
+      <td>S<Name></Name></td>
+      <td>该属性定义一个自定义的setter选择器名字。该名字跟在S后面（例如，ScustomSetter）。</td>
+    </tr>
+    <tr>
+      <td>D</td>
+      <td>动态属性（@dynamic）</td>
+    </tr>
+    <tr>
+      <td>W</td>
+      <td>弱引用属性（__weak）</td>
+    </tr>
+    <tr>
+      <td>P</td>
+      <td>该属性有资格进行垃圾收集</td>
+    </tr>
+    <tr>
+      <td>t<encoding></encoding></td>
+      <td>使用旧式编码制定类型</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>例子，可参阅下面。</p>
+
+<h3 id="property-attribute描述例子">Property Attribute描述例子</h3>
+
+<p>给定这些定义：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enum FooManChu {
+    FOO,
+    Man,
+    CHU
+};
+
+struct YorkshireTeaStruct {
+    int pot;
+    char lady;
+};
+
+typedef struct YorkshireTeaStruct YorkshireTeaStructType;
+union MoneyUnion {
+    float alone;
+    double down;
+};
+</code></pre></div></div>
+
+<p>下面的表格显示了示例属性声明和通过property_getAttributes返回的相应字符串：</p>
+
+<p><a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtPropertyIntrospection.html">详见</a></p>
