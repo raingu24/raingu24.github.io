@@ -1,0 +1,110 @@
+<p><a href="/index.html">返回首页</a></p>
+
+<p>本系列，是参照“奔跑中的IT男”的“runtime从入门到精通”系列写就的。本系列的脉络和原系列一致，只是在语言描述和例子上有所不同。点击<a href="https://blog.csdn.net/coyote1994/article/details/52451309">这里</a>查看原文。</p>
+
+<h4 id="温故">温故</h4>
+
+<p><strong>RunTime，就是系统在运行的时候的一些机制，其中最主要的是消息机制。</strong>
+<strong>RunTime基本是用C和汇编写的，从而有了动态系统的高效。</strong></p>
+
+<h4 id="oc和c在函数调用上的对比">OC和C在函数调用上的对比</h4>
+
+<h5 id="c语言">C语言</h5>
+<ol>
+  <li>函数的调用在编译的时候就决定调用哪个函数，编译完成之后直接顺序执行，无任何二义性。</li>
+  <li>C语言在编译阶段调用未实现的函数就会报错。</li>
+</ol>
+
+<h5 id="oc">OC</h5>
+<ol>
+  <li>函数的调用成为消息发送，属于动态调用过程。</li>
+  <li>在编译的时候并不能决定真正调用哪个函数（事实证明，在编译阶段，OC可以调用任何函数，即使这个函数并未实现，只要声明过就不会报错）。</li>
+</ol>
+
+<h4 id="三种层面上与runtime系统进行交互">三种层面上与runtime系统进行交互</h4>
+
+<h5 id="1-通过oc源码">1. 通过OC源码</h5>
+
+<p>多数情况我们只需要编写OC代码即可。runtime系统自动在幕后搞定一切。编译器会将OC代码转换成运行时代码，在运行时确定数据结构和函数。</p>
+
+<h5 id="2-通过foundation框架的nsobject类定义的方法">2. 通过Foundation框架的NSObject类定义的方法</h5>
+
+<p>有一些NSObject的方法可以从runtime系统中获取信息，允许对象进行自我检查，例如：</p>
+<ul>
+  <li>class方法返回对象的类；</li>
+  <li>isKindOfClass:和isMemberOfClass:方法检查对象是否存在于指定的类的继承体系中；</li>
+  <li>respondsToSelector:检查对象能否响应指定的消息；</li>
+  <li>conformsToProtocol:检查对象是否实现了指定协议类的方法；</li>
+  <li>methodForSelector:返回指定方法实现的地址。</li>
+</ul>
+
+<h5 id="3-通过runtime库函数的直接调用">3. 通过runtime库函数的直接调用</h5>
+
+<p>只要我们引入头文件objc/runtime.h，就可以直接使用rungtime库的公共接口。下面介绍一些常用的runtime接口。</p>
+
+<p><strong>3.1 获取类</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Class PersonClass = objc_getClass([Person class]);
+</code></pre></div></div>
+
+<p><strong>3.2 SEL是selector在objc中的表示</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SEL oriSEL = @selector(test);
+</code></pre></div></div>
+
+<p><strong>3.3 获取类方法</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Method class_getClassMethod(Class cls, SEL name);
+</code></pre></div></div>
+
+<p><strong>3.4 获取实例方法</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Method class_getInstanceMethod(Class cls, SEL name); 
+</code></pre></div></div>
+
+<p><strong>3.5 添加方法</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BOOL addSucc = class_addMethod(Class cls, SEL sel, method_getImplemetation(Method), meethod_getTypeEncoding(Method));
+</code></pre></div></div>
+
+<p><strong>3.6 替换原方法实现</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class_replaceMethod(toolClass, cusSEL, method_getImplementation(oriMethod), method_getTypeEncoding(oriMethod));
+</code></pre></div></div>
+
+<p><strong>3.7 交换两个方法</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>method_exchangeImplemetation(oriMethod, cusMethod);
+</code></pre></div></div>
+
+<p><strong>3.8 获取一个类的属性列表(返回值是一个数组)</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>objc_property_t *propertyList = class_copyPropertyList([self class], &amp;count);
+</code></pre></div></div>
+
+<p><strong>3.9 获取一个类的方法列表</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Method *methodList = class_copyMethodList([self class], &amp;count);
+</code></pre></div></div>
+
+<p><strong>3.10 获取一个类的成员变量列表</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Ivar *ivarList = class_copyIvarList([self class], &amp;count);
+</code></pre></div></div>
+
+<p><strong>3.11 获取成员变量的名字</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const char *ivar_getName(Ivar v)
+</code></pre></div></div>
+
+<p><strong>3.12 获取成员变量的类型</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const char *ivar_getTypeEncoding(Ivar v)
+</code></pre></div></div>
+
+<p><strong>3.13 获取一个类的协议列表</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>__unsafe_unretained Protocol **protocolList = class_copyProtocolList([self class], &amp;count);
+</code></pre></div></div>
+
+<p><strong>3.14 set方法</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 作用：将值value和对象objcet关联起来（将值value存储到对象object中），实际就是给object增加属性。
+// 参数object：给哪个对象设置属性
+// 参数key：属性的名字
+// 参数value：属性的值
+// 参数policy：存储策略（assign、copy、retain、strong）
+void objc_setAsscciatedObject(id object, const void *key, id value, objc_AssociationPolicy policy)
+
+</code></pre></div></div>
+
+<p><strong>3.15 利用参数key将对象objcet中存储的对应值取出来</strong></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>id objc_getAssociatedObject(id object, const void *key)
+</code></pre></div></div>
+

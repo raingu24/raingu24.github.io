@@ -1,0 +1,128 @@
+<p><a href="/index.html">返回首页</a></p>
+
+<h2 id="变量作用域与解构赋值">变量作用域与解构赋值</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>			/* 变量的作用域
+				在函数体内声明的变量，作用域在函数体内。
+			    两个不同函数体内相同变量名的两个变量名，不会产生干扰。
+				嵌套的函数，内部函数可以访问外部函数的变量，但是外部函数不能访问内部函数的变量。如果内外函数都有相同的变量，那么内部函数在使用时，内部的变量会屏蔽外部的变量。
+			*/
+
+			/* 变量提升
+				就是在编译的时候，JS会把整个函数体所有的变量声明都提升到函数顶部，而声明的赋值不会提升。所以要严格遵守在定义函数的时候，把所有的变量声明都写在函数开始的位置。
+			*/
+			function foo() {
+				var x = 'Hello ' + y;	// 不会报错，证明y被声明。但是会显示Hello undefined，证明y的赋值没有被提升。
+				console.log(x);
+				var y = 'Bob';
+			}
+			foo();
+			
+			/* 全局作用域
+			    JS默认一个全局对象window。所有不在函数内定义的变量都会成为windwo对象的属性。
+			 */
+			var course = "window's property";
+			console.log(course);
+			console.log(window.course);		// same result as above
+			
+			function foo1() {
+				console.log('foo');
+			}
+			foo1();
+			window.foo1();		// same result as above. function is a property of 'window'.
+
+			window.console.log('console is a property of window too.');	// console is a property of window too.
+			var old_console = window.console.log;
+			window.console.log = function(){};
+			console.log('can not print in console.');
+			old_console('but old_console can print.');
+			window.console.log = old_console;
+			console.log('can work again.');
+
+			// 如果没有找到变量，则会报ReferenceError错误。
+
+			/* 名字空间（namespace）
+				变量会绑定在window上，不同的JS文件如果使用了相同的全局变量，或定义了相同名字的顶层函数，都会造成命名的冲突，并且很难被发现。
+				所以要把自己的所有变量和函数绑定在另一个全局变量中，相当于自建了一个命名空间。这是开发的时候提倡的一种做法。
+			*/	
+
+			var MYAPP = {};
+			MYAPP.name = 'myapp';
+			MYAPP.version = 1.0;
+			MYAPP.foo = function(){
+				return 'foo';
+			};
+			console.log(MYAPP.name);
+
+
+			/* 局部作用域
+				JS的变量作用域，是在函数的内部起作用。而像for语句里的变量声明是不能声明为局部作用域的变量的。所以要使用let关键在来实现。
+			*/
+			function foo2(){
+				for (var i = 0; i&lt;100; i++) {
+					//
+				}
+				console.log(i);		// var声明的变量可以在循环外起作用。
+			}
+			function foo3(){
+				for (let i = 0; i&lt;100; i++){
+					//
+				}
+				console.log(i);		// let声明的变量只在局部起作用。
+			}
+			foo2();
+			//foo3();
+
+
+			/* 用const声明常量。*/
+			const PI = 3.14;
+			//PI = 3;					// 声明常量后，就是只读属性，不能被赋值
+			console.log(PI);		// 3.14
+			let vv = 3.333;
+			vv = 3.42;
+			console.log(vv);		// 3.42 所以let声明的只是个变量。
+
+
+			/*解构赋值
+			   所谓的解构，就是把结构解开的意思。把结构解开再赋值。其作用是简化代码，使逻辑更清晰。	
+			*/
+			var arr = ['Hello', 'javascript','ES6'];
+			var [x,y,z] = arr;		
+			console.log('x = ' + x + ', y = ' + y + ', z = ' + z);
+
+			let [x1, [y1,z1]] = [1,[2,3]];	// 可以嵌套，但是要注意结构要一致
+			console.log('x1 = ' + x1 + ', y1 = ' + y1 + ', z1 = ' + z1);
+
+			// 可以忽略某些元素
+			let [,,z2] = arr;
+			console.log('z2 = ' + z2);
+
+			// 也可以从对象中取出属性
+			var person = {
+				name: 'jason',
+				age: 20,
+				gender: 'male',
+				passport: 'G-123456',
+				school: 'middle school',
+				address: {
+					city: 'beijing',
+					street: 'first rode',
+					zipcode: '100000'
+				}
+			}
+			var {name,age,passport} = person;		// 注意花括号和方括号，也是适配要解构的对象是什么。方括号是数组，花括号是对象。
+			console.log('name = ' + name + ', age = ' + age + ', passport = ' + passport);
+			({name, address:{city, horse}} = person);
+			console.log('name = ' + name + ', city = ' + city + ', horse = ' + horse);
+			({name, passport:id} = person);
+			console.log('name2 = ', name + ', id = ' + id);
+
+			({name, single=true} = person);
+			console.log('name3 = ' + name + ', single = ' + single);
+
+			// 使用已声明过的变量的时候，要有小括号包裹，否则会报语法错误。因为编译器会把花括号当作是语句块处理。
+			({x,y} = {name:'jason', x:100, y:200});
+			console.log('name = ' + name + ', x = ' + x + ', y = ' + y);
+
+
+</code></pre></div></div>
